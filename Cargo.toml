@@ -1,0 +1,28 @@
+
+[package]
+authors = ["LongYinan <lynweklm@gmail.com>"]
+edition = "2021"
+name = "selection_text_aware"
+version = "0.1.0"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "2.16.17", default-features = false, features = ["napi4", "async"] }
+napi-derive = "2.16.13"
+windows = { version = "0.62.2", features = [
+    "Win32_UI_Accessibility",
+    "Win32_System_Com",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_System_LibraryLoader", #用于获取模块句柄
+    "Win32_Foundation",
+    "Win32_System_Variant",
+] }
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+lto = true
+strip = "symbols"
