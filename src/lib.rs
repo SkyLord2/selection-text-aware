@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use windows::{
-    // core::*,
+    core::*,
     Win32::Foundation::*,
     Win32::System::Com::*,
     Win32::System::LibraryLoader::GetModuleHandleW,
@@ -134,17 +134,17 @@ fn get_focused_selection() -> Result<String> {
 }
 
 #[napi]
-pub fn selection_initialize() -> Result<()> {
+pub fn selection_initialize() -> napi::Result<()> {
   unsafe {
         // 1. 设置全局鼠标钩子
-        let instance = GetModuleHandleW(None)?;
+        let instance = GetModuleHandleW(None).map_err(|e| napi::Error::from_reason(format!("Failed to get module handle: {}", e)))?;
         let instance_handle = HINSTANCE(instance.0);
         let hook_id = SetWindowsHookExW(
             WH_MOUSE_LL,
             Some(mouse_hook_proc),
             Some(instance_handle),
             0,
-        )?;
+        ).map_err(|e| napi::Error::from_reason(format!("Failed to set hook: {}", e)))?;
 
         if hook_id.is_invalid() {
             eprintln!("无法安装鼠标钩子！");
